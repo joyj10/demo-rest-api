@@ -58,23 +58,26 @@ tasks.named('test') {
 
 tasks.register("restDocsTest", Test) {
     outputs.dir snippetsDir
-    useJUnitPlatform() {
+    useJUnitPlatform {
         includeTags("restDocs")
     }
 
     finalizedBy "asciidoctor"
 }
 
-tasks.named('asciidoctor') {
+tasks.named("asciidoctor") {
     dependsOn restDocsTest
 
     inputs.dir snippetsDir
     configurations "asciidoctorExt"
     baseDirFollowsSourceDir()
+
+    // Output directory 설정 (layout.buildDirectory 사용)
+    outputDir = layout.buildDirectory.dir("docs/asciidoc").get().asFile
 }
 
 tasks.register('copyAsciidocHTML', Copy) {
     dependsOn asciidoctor
-    from "${asciidoctor.outputDir}"
+    from layout.buildDirectory.dir("docs/asciidoc").get()
     into "${project.rootDir}/src/main/resources/static/docs"
 }
